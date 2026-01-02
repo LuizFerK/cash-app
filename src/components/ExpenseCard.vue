@@ -51,7 +51,7 @@ const { lengthX, isSwiping } = useSwipe(el, {
 const formatDate = (date: any) => {
   if (!date) return ''
   const d = date.toDate ? date.toDate() : date
-  return dayjs(d).format('DD/MM/YYYY HH:mm')
+  return dayjs(d).format('DD/MM HH:mm')
 }
 </script>
 
@@ -73,11 +73,11 @@ const formatDate = (date: any) => {
       relative bg="#412B6B" p-4 rounded-xl shadow-sm border="~ #5C3E94" flex justify-between items-center transition-transform will-change-transform
       :style="{ transform: `translateX(${left})`, opacity: opacity, transition: isSwiping ? 'none' : 'all 0.3s ease-out' }"
     >
-      <div>
-        <h3 font-bold text-gray-200>{{ expense.name }}</h3>
+      <div text-left w="2/3">
+        <h3 font-bold text-gray-200 overflow-hidden text-ellipsis whitespace-nowrap>{{ expense.name }}</h3>
         <p text-xs text-gray-500>{{ expense.category }} • {{ formatDate(expense.createdAt) }}</p>
       </div>
-      <div text-red-500 font-bold font-mono>
+      <div w-32 text-red-500 font-bold font-mono text-right>
         - R$ {{ expense.amount.toFixed(2) }}
       </div>
     </div>

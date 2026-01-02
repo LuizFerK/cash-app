@@ -41,13 +41,17 @@ async function handleSubmit() {
 }
 
 function close() {
+  name.value = ''
+  category.value = ''
+  amount.value = ''
   emit('update:modelValue', false)
 }
 </script>
 
 <template>
-  <div v-if="modelValue" fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black-50 backdrop-blur-sm @click.self="close">
-    <div w-full max-w-sm bg-white rounded-t-2xl sm:rounded-2xl p-6 shadow-xl transform transition-all>
+  <Transition name="modal">
+    <div v-if="modelValue" fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black-50 backdrop-blur-sm @click.self="close">
+      <div w-full max-w-sm bg-white rounded-t-2xl sm:rounded-2xl p-6 shadow-xl class="modal-card">
       <h2 text-xl font-bold mb-4 text-gray-900>Registrar Gasto</h2>
       
       <form @submit.prevent="handleSubmit" space-y-4>
@@ -106,4 +110,27 @@ function close() {
       </form>
     </div>
   </div>
+  </Transition>
 </template>
+
+<style scoped>
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .modal-card,
+.modal-leave-active .modal-card {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-enter-from .modal-card,
+.modal-leave-to .modal-card {
+  transform: translateY(100%);
+}
+</style>

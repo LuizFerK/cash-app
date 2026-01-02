@@ -14,7 +14,6 @@ const showAddModal = ref(false)
       Carregando...
     </div>
     <div v-else max-w-md mx-auto min-h-screen flex flex-col relative>
-      
       <!-- Header / Balance -->
       <header bg="#211832" pt-10 pb-6 px-6 shadow-sm z-10 sticky top-0>
         <h1 text-sm uppercase tracking-wide text-gray-200 mb-1 font-bold>Saldo Atual</h1>
