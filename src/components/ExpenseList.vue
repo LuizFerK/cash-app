@@ -12,10 +12,9 @@ const props = defineProps<{
 
 const { deleteExpense } = useFinance()
 
-const handleDelete = async (id?: string) => {
-  if (!id) return
+const handleDelete = async (expense: Expense) => {
   if (confirm('Tem certeza que deseja apagar este gasto?')) {
-    await deleteExpense(id)
+    await deleteExpense(expense)
   }
 }
 
@@ -47,7 +46,7 @@ const formatDate = (date: any) => {
           - R$ {{ expense.amount.toFixed(2) }}
         </div>
         <button 
-          @click="handleDelete(expense.id)"
+          @click="handleDelete(expense)"
           p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red="900/20" rounded-lg transition-colors
           aria-label="Deletar"
         >

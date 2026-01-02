@@ -8,15 +8,21 @@ import {
   serverTimestamp,
   query,
   orderBy,
+  limit,
   setDoc,
   deleteDoc,
-  Timestamp
+  Timestamp,
+  DocumentReference,
+  type DocumentData,
+  Query
 } from 'firebase/firestore'
 import type { Expense, Config, ExpenseInput } from '../types'
 import dayjs from 'dayjs'
 
 const expenses = ref<Expense[]>([])
+const expensesRef = ref<Query<DocumentData, DocumentData> | null>(null)
 const config = ref<Config | null>(null)
+const configRef = ref<DocumentReference<DocumentData, DocumentData> | null>(null)
 const loading = ref(true)
 
 // Singleton state
@@ -28,29 +34,20 @@ export function useFinance() {
     initialized = true
   }
 
-  const balance = computed(() => {
-    if (!config.value) return 0
-
-    const start = dayjs(config.value.startDate.toDate())
-    const now = dayjs()
-    const daysPassed = now.diff(start, 'day')
-
-    const totalIncome = Math.max(0, daysPassed) * config.value.dailyAmount + (config.value.manualOffsets || 0)
-
-    const totalExpenses = expenses.value.reduce((acc, curr) => acc + curr.amount, 0)
-
-    return totalIncome - totalExpenses
-  })
+  const balance = computed(() => config.value?.balance || 0)
 
   async function addExpense(expense: ExpenseInput) {
     await addDoc(collection(db, 'expenses'), {
       ...expense,
       createdAt: serverTimestamp()
     })
+    await updateBalance(-expense.amount)
   }
 
-  async function deleteExpense(id: string) {
-    await deleteDoc(doc(db, 'expenses', id))
+  async function deleteExpense(expense: Expense) {
+    if (!expense.id) return
+    await deleteDoc(doc(db, 'expenses', expense.id))
+    await updateBalance(expense.amount)
   }
 
   return {
@@ -65,9 +62,8 @@ export function useFinance() {
 
 function init() {
   // Listen to expenses
-  const expensesQuery = query(collection(db, 'expenses'), orderBy('createdAt', 'desc'))
-
-  onSnapshot(expensesQuery, (snapshot) => {
+  expensesRef.value = query(collection(db, 'expenses'), orderBy('createdAt', 'desc'), limit(10))
+  onSnapshot(expensesRef.value, (snapshot) => {
     expenses.value = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
@@ -75,20 +71,53 @@ function init() {
   })
 
   // Listen to config
-  const configRef = doc(db, 'config', 'main')
-  onSnapshot(configRef, async (snapshot) => {
-    if (snapshot.exists()) {
-      config.value = snapshot.data() as Config
-    } else {
-      // Initialize default config if not exists
-      // Default: Start today, 72 daily
-      const defaultConfig = {
-        startDate: Timestamp.now(),
-        dailyAmount: 72,
-        manualOffsets: 0
-      }
-      await setDoc(configRef, defaultConfig)
-    }
+  configRef.value = doc(db, 'config', 'main')
+  onSnapshot(configRef.value, async (snapshot) => {
+    if (!snapshot.exists()) return await setupDefaultConfig()
+
+    const configData = snapshot.data() as Config
+    const isSynced = configData.lastSync.toDate().getDay() === Timestamp.now().toDate().getDay()
+
+    if (!isSynced) return await syncBalance(configData)
+
+    config.value = configData
     loading.value = false
   })
+}
+
+async function setupDefaultConfig() {
+  const dailyAmount = Number(import.meta.env.VITE_DAILY_AMOUNT)
+  const configData = {
+    lastSync: Timestamp.now(),
+    balance: dailyAmount,
+    dailyAmount
+  }
+
+  await setDoc(configRef.value!, configData)
+
+  config.value = configData
+  loading.value = false
+}
+
+async function syncBalance(configData: Config) {
+  const daysPassed = dayjs().diff(dayjs(configData.lastSync.toDate()), 'day')
+  const totalIncome = Math.max(1, daysPassed) * configData.dailyAmount
+
+  await updateBalance(totalIncome)
+
+  loading.value = false
+}
+
+async function updateBalance(value: number) {
+  if (!config.value) return
+
+  const configData = {
+    lastSync: Timestamp.now(),
+    dailyAmount: config.value.dailyAmount,
+    balance: config.value.balance + value
+  }
+
+  await setDoc(configRef.value!, configData)
+
+  config.value = configData
 }

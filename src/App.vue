@@ -30,15 +30,17 @@ const showAddModal = ref(false)
       </header>
 
       <!-- Content -->
-      <main flex-1 p-6>
-        <h2 text-lg font-bold mb-4>Histórico</h2>
+      <main flex-1 py-6>
+        <h2 text-lg text-gray-500 font-bold mb-4>Histórico</h2>
         <ExpenseList :expenses="expenses" />
       </main>
 
       <!-- FAB -->
       <button 
         @click="showAddModal = true"
-        fixed bottom-6 right-6 w-14 h-14 bg-black dark:bg-white text-white dark:text-black rounded-full shadow-lg flex items-center justify-center text-2xl hover:scale-105 transition-transform active:scale-95 focus:outline-none
+        fixed bottom-6 right-6 w-14 h-14 bg-black dark:bg-white text-white
+        dark:text-black rounded-full shadow-lg flex items-center justify-center
+        text-2xl hover:scale-105 transition-transform active:scale-95 focus:outline-none
         aria-label="Adicionar Gasto"
       >
         +
@@ -48,10 +50,3 @@ const showAddModal = ref(false)
     </div>
   </div>
 </template>
-
-<style>
-/* Global resets or simple overrides */
-html, body {
-  overscroll-behavior-y: none; /* Prevent pull-to-refresh on mobile if not desired */
-}
-</style>

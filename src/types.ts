@@ -15,7 +15,7 @@ export interface ExpenseInput {
 }
 
 export interface Config {
-  startDate: Timestamp
+  lastSync: Timestamp
+  balance: number
   dailyAmount: number
-  manualOffsets?: number
 }
