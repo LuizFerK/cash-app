@@ -12,10 +12,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Economy Balance',
-        short_name: 'EcoBalance',
+        name: 'Savy',
+        short_name: 'Savy',
         description: 'Daily savings tracker',
-        theme_color: '#ffffff',
+        theme_color: '#211832',
         icons: [
           {
             src: 'pwa-192x192.png',
