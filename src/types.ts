@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore'
 
 export interface Expense {
-  id?: string
+  id: string
   name: string
   category: string
   amount: number

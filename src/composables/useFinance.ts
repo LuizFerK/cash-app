@@ -35,6 +35,7 @@ export function useFinance() {
   }
 
   const balance = computed(() => config.value?.balance || 0)
+  const dailyAmount = computed(() => config.value?.dailyAmount || 0)
 
   async function addExpense(expense: ExpenseInput) {
     await addDoc(collection(db, 'expenses'), {
@@ -60,6 +61,7 @@ export function useFinance() {
     expenses,
     config,
     balance,
+    dailyAmount,
     loading,
     addExpense,
     deleteExpense,
@@ -83,7 +85,7 @@ function init() {
     if (!snapshot.exists()) return await setupDefaultConfig()
 
     const configData = snapshot.data() as Config
-    const isSynced = configData.lastSync.toDate().getDay() === Timestamp.now().toDate().getDay()
+    const isSynced = configData.lastSync.toDate().getDate() === Timestamp.now().toDate().getDate()
 
     if (!isSynced) return await syncBalance(configData)
 
@@ -107,9 +109,12 @@ async function setupDefaultConfig() {
 }
 
 async function syncBalance(configData: Config) {
-  const daysPassed = dayjs().diff(dayjs(configData.lastSync.toDate()), 'day')
-  const totalIncome = Math.max(1, daysPassed) * configData.dailyAmount
+  const today = dayjs().startOf('day')
+  const lastSync = dayjs(configData.lastSync.toDate()).startOf('day')
+  const daysPassed = today.diff(lastSync, 'day')
+  const totalIncome = Math.max(1, daysPassed) * Number(import.meta.env.VITE_DAILY_AMOUNT)
 
+  config.value = configData
   await updateBalance(totalIncome)
 
   loading.value = false
@@ -120,7 +125,7 @@ async function updateBalance(value: number) {
 
   const configData = {
     lastSync: Timestamp.now(),
-    dailyAmount: config.value.dailyAmount,
+    dailyAmount: Number(import.meta.env.VITE_DAILY_AMOUNT),
     balance: config.value.balance + value
   }
 

@@ -33,14 +33,13 @@ const { lengthX, isSwiping } = useSwipe(el, {
     if (lengthX.value > 150) {
       opacity.value = 1 - (lengthX.value - 150) / 100
     }
-    isSwiping.value // Trigger re-render if needed
   },
   onSwipeEnd() {
     if (lengthX.value > 150) { // Threshold reached
       left.value = '-100%'
       opacity.value = 0
       // Small delay for animation before emitting
-      setTimeout(() => emit('delete', props.expense), 300)
+      setTimeout(() => emit('delete', props.expense), 100)
     } else {
       // Bounce back
       left.value = '0px'
