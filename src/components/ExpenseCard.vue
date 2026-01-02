@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useSwipe } from '@vueuse/core'
 import type { Expense } from '../types'
 import dayjs from 'dayjs'
+import * as Lucide from 'lucide-vue-next'
 
 const props = defineProps<{
   expense: Expense
@@ -53,32 +54,50 @@ const formatDate = (date: any) => {
   const d = date.toDate ? date.toDate() : date
   return dayjs(d).format('DD/MM HH:mm')
 }
+
+const expenseUtils = computed(() => {
+  return {
+    Mercado: { icon: Lucide.ShoppingCart, color: '#A3DC9A' },
+    Restaurante: { icon: Lucide.Utensils, color: '#CD5656' },
+    Delivery: { icon: Lucide.HamburgerIcon, color: '#B77466' },
+    'Uber/99': { icon: Lucide.CarTaxiFront, color: '#FD7979' },
+    BlaBlaCar: { icon: Lucide.Luggage, color: '#BBDCE5' },
+    Ônibus: { icon: Lucide.BusFront, color: '#BBDCE5' },
+    Farmácia: { icon: Lucide.HeartPlus, color: '#8CA9FF' },
+    Cinema: { icon: Lucide.Clapperboard, color: '#DEE791' },
+    Ingresso: { icon: Lucide.Ticket, color: '#7F55B1' },
+    Outros: { icon: Lucide.Box, color: '#f98fa5' },
+  }[props.expense.category]
+})
 </script>
 
 <template>
-  <div relative overflow-hidden rounded-xl mb-4 select-none touch-pan-y>
+  <div v-if="expenseUtils" relative rounded-xl mb-4 select-none touch-pan-y>
     <!-- Background (Trash Icon) -->
     <div 
-      absolute inset-0 m-1 bg-red-600 rounded-xl flex items-center justify-end pr-6 pointer-events-none
+      absolute inset-0 m-1 bg-gray-200 bg-opacity-10 rounded-3xl flex items-center justify-end pr-6 pointer-events-none
     >
-      <div text-white font-bold flex items-center gap-2>
+      <div text-white font-medium flex items-center gap-2>
         <span>Apagar</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <Lucide.Trash :size="22" />
       </div>
     </div>
 
     <!-- Foreground Card -->
     <div 
       ref="el"
-      relative bg="#412B6B" p-4 rounded-xl shadow-sm border="~ #5C3E94" flex justify-between items-center transition-transform will-change-transform
+      relative bg="#3f4171" p-4 rounded-3xl shadow-sm flex justify-between items-center transition-transform will-change-transform
       :style="{ transform: `translateX(${left})`, opacity: opacity, transition: isSwiping ? 'none' : 'all 0.3s ease-out' }"
     >
-      <div text-left w="2/3">
-        <h3 font-bold text-gray-200 overflow-hidden text-ellipsis whitespace-nowrap class="expense_name">{{ expense.name }}</h3>
-        <p text-xs text-gray-500>{{ expense.category }} • {{ formatDate(expense.createdAt) }}</p>
+      <div mr-4 w-13 h-10 rounded-xl bg="#343466" grid place-items-center>
+        <component :is="expenseUtils.icon" :size="20" :color="expenseUtils.color" />
       </div>
-      <div w-32 text-red-500 font-bold font-mono text-right>
-        - R$ {{ expense.amount.toFixed(2) }}
+      <div text-left w="2/3">
+        <h3 font-semibold text-gray-200 overflow-hidden text-ellipsis whitespace-nowrap class="expense_name">{{ expense.name }}</h3>
+        <p text-xs text-gray-400>{{ expense.category }} • {{ formatDate(expense.createdAt) }}</p>
+      </div>
+      <div w-32 text="#f98fa5" font-bold font-mono text-right>
+        -R${{ expense.amount.toFixed(2) }}
       </div>
     </div>
   </div>

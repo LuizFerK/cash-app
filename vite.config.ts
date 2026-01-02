@@ -16,8 +16,8 @@ export default defineConfig({
         name: 'Savy',
         short_name: 'Savy',
         description: 'Daily savings tracker',
-        theme_color: '#211832',
-        background_color: '#211832',
+        theme_color: '#e3e3e3',
+        background_color: '#e3e3e3',
         icons: [
           {
             src: 'pwa-192x192.png',

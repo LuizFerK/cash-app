@@ -5,4 +5,9 @@ export default defineConfig({
     presetWind3(),
     presetAttributify(),
   ],
+  theme: {
+    fontFamily: {
+      sans: 'Poppins, sans-serif',
+    },
+  },
 })
