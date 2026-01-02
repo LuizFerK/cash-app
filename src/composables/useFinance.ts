@@ -50,13 +50,20 @@ export function useFinance() {
     await updateBalance(expense.amount)
   }
 
+  async function restoreExpense(expense: Expense) {
+    if (!expense.id) return
+    await setDoc(doc(db, 'expenses', expense.id), expense)
+    await updateBalance(-expense.amount)
+  }
+
   return {
     expenses,
     config,
     balance,
     loading,
     addExpense,
-    deleteExpense
+    deleteExpense,
+    restoreExpense
   }
 }
 
