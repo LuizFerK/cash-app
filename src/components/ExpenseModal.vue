@@ -68,12 +68,23 @@ function close() {
 
         <div>
           <label block text-sm font-medium text-gray-700 mb-1>Categoria</label>
-          <input 
+          <select 
             v-model="category"
-            type="text" 
             w-full rounded-lg border-gray-300 bg-gray-50 p-2.5 text-sm focus:ring-green-500 focus:border-green-500
-            placeholder="Ex: Alimentação"
-          />
+            :class="category === '' ? 'text-gray-400' : 'text-gray-700'"
+          >
+            <option selected disabled value="">Ex: Mercado</option>
+            <option value="Mercado">Mercado</option>
+            <option value="Comida/Bebida">Comida/Bebida</option>
+            <option value="Delivery">Delivery</option>
+            <option value="Uber/99">Uber/99</option>
+            <option value="BlaBlaCar">BlaBlaCar</option>
+            <option value="Ônibus">Ônibus</option>
+            <option value="Farmácia">Farmácia</option>
+            <option value="Cinema">Cinema</option>
+            <option value="Ingresso">Ingresso</option>
+            <option value="Outros">Outros</option>
+          </select>
         </div>
 
         <div>

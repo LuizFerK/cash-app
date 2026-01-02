@@ -74,7 +74,7 @@ const formatDate = (date: any) => {
       :style="{ transform: `translateX(${left})`, opacity: opacity, transition: isSwiping ? 'none' : 'all 0.3s ease-out' }"
     >
       <div text-left w="2/3">
-        <h3 font-bold text-gray-200 overflow-hidden text-ellipsis whitespace-nowrap>{{ expense.name }}</h3>
+        <h3 font-bold text-gray-200 overflow-hidden text-ellipsis whitespace-nowrap class="expense_name">{{ expense.name }}</h3>
         <p text-xs text-gray-500>{{ expense.category }} • {{ formatDate(expense.createdAt) }}</p>
       </div>
       <div w-32 text-red-500 font-bold font-mono text-right>
@@ -83,3 +83,9 @@ const formatDate = (date: any) => {
     </div>
   </div>
 </template>
+
+<style>
+.expense_name::first-letter {
+  text-transform: uppercase;
+}
+</style>
