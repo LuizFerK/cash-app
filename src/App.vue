@@ -24,7 +24,7 @@ const dailyAmountFormatted = computed(() => {
 <template>
   <div class="background-accent" :class="{'green': balance >= 0, 'red': balance < 0, 'opacity-0': loading, 'opacity-100': !loading}"></div>
   <div class="background-accent secondary" :class="{'green': balance >= 0, 'red': balance < 0, 'opacity-0': loading, 'opacity-100': !loading}"></div>
-  <div h-screen text-left min-h-screen text-gray-900 font-sans>
+  <div overflow-y-hidden h-screen text-left min-h-screen text-gray-900 font-sans>
     <div max-w-md mx-auto h-full flex flex-col relative>
       <!-- Header / Balance -->
       <header px-4 h="1/4" z-10 sticky top-0 pt-8 pb-3 flex="~ col" justify-between>
