@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useFinance } from '../composables/useFinance'
 import { ChevronLeft } from 'lucide-vue-next'
 import type { Category } from '../types'
@@ -18,18 +18,41 @@ const { addExpense } = useFinance()
 const currentStep = ref(1)
 const name = ref('')
 const category = ref<Category | ''>('')
-const amount = ref<number | ''>('')
+const amount = ref(0)
 const loading = ref(false)
+
+const formattedAmount = computed(() => {
+  return amount.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+})
+
+function handleAmountInput(e: Event) {
+  const input = e.target as HTMLInputElement
+  const value = input.value
+  const digits = value.replace(/\D/g, '')
+  amount.value = Number(digits) / 100
+  
+  // Force update input value to matches formatted state
+  // This fixes cases where value doesn't change (0 -> 0)
+  // or when invalid chars are typed
+  input.value = amount.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+}
+
+const amountInput = ref<HTMLInputElement | null>(null)
+const nameInput = ref<HTMLInputElement | null>(null)
 
 function selectCategory(cat: Category) {
   category.value = cat
 }
 
-function nextStep() {
+async function nextStep() {
   if (currentStep.value === 1 && category.value) {
     currentStep.value = 2
-  } else if (currentStep.value === 2 && amount.value) {
+    await nextTick()
+    amountInput.value?.focus()
+  } else if (currentStep.value === 2 && amount.value > 0) {
     currentStep.value = 3
+    await nextTick()
+    nameInput.value?.focus()
   }
 }
 
@@ -41,7 +64,7 @@ async function handleSave() {
     await addExpense({
       name: name.value,
       category: category.value,
-      amount: Number(amount.value)
+      amount: amount.value
     })
     close()
   } catch (e) {
@@ -56,7 +79,7 @@ function close() {
   currentStep.value = 1
   name.value = ''
   category.value = ''
-  amount.value = ''
+  amount.value = 0
   emit('update:modelValue', false)
 }
 </script>
@@ -102,16 +125,18 @@ function close() {
           </div>
 
           <!-- Step 2: Amount -->
-          <div v-if="currentStep === 2" flex flex-col items-center justify-center h-full>
+          <div v-if="currentStep === 2" flex flex-col h-full>
             <label text-gray-400 text-sm mb-2>Quanto foi?</label>
             <div relative w-full>
               <span absolute left-0 top="1/2" translate-y="-1/2" text-2xl text-gray-400 font-medium>R$</span>
               <input
-                v-model="amount"
-                type="number" 
-                step="0.01"
-                w-full pl-10 bg-transparent text-4xl font-bold text-white text-center focus:outline-none placeholder-gray-600
-                placeholder="0.00"
+                ref="amountInput"
+                type="tel" 
+                inputmode="numeric"
+                :value="formattedAmount"
+                @input="handleAmountInput"
+                w-full pl-10 bg-transparent border-b-2 border="white/20" text-4xl font-bold text-white text-center focus:outline-none placeholder-gray-600
+                placeholder="0,00"
                 autofocus
                 @keydown.enter="nextStep"
               />
@@ -122,6 +147,7 @@ function close() {
           <div v-if="currentStep === 3" flex flex-col h-full>
             <label text-gray-400 text-sm mb-2>Nome do gasto</label>
             <input 
+              ref="nameInput"
               v-model="name"
               type="text" 
               w-full bg-transparent border-b-2 border="white/20" py-3 text-xl text-white placeholder-gray-500 outline-none transition-colors

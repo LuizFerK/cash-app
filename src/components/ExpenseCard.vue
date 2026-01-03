@@ -63,9 +63,10 @@ const category = computed(() => categories[props.expense.category])
   <div relative rounded-xl mb-4 select-none touch-pan-y>
     <!-- Background (Trash Icon) -->
     <div 
-      :opacity="left" transition="opacity" absolute inset-0 m-1
+      transition="opacity" absolute inset-0 m-1
       bg-gradient-to-l from-gray="200/10" to-transparent rounded-3xl flex items-center
       justify-end pr-6 pointer-events-none
+      :style="{ opacity: -left / 100 }"
     >
       <div text-white font-medium flex items-center gap-2>
         <span>Apagar</span>

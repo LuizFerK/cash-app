@@ -115,16 +115,16 @@ async function syncBalance(configData: Config) {
   const totalIncome = Math.max(1, daysPassed) * Number(import.meta.env.VITE_DAILY_AMOUNT)
 
   config.value = configData
-  await updateBalance(totalIncome)
+  await updateBalance(totalIncome, true)
 
   loading.value = false
 }
 
-async function updateBalance(value: number) {
+async function updateBalance(value: number, sync: boolean = false) {
   if (!config.value) return
 
   const configData = {
-    lastSync: Timestamp.now(),
+    lastSync: sync ? Timestamp.now() : config.value.lastSync,
     dailyAmount: Number(import.meta.env.VITE_DAILY_AMOUNT),
     balance: config.value.balance + value
   }
