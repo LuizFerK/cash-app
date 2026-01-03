@@ -38,7 +38,7 @@ const { lengthX, isSwiping } = useSwipe(el, {
   },
   onSwipeEnd() {
     if (lengthX.value > 150) { // Threshold reached
-      left.value = 350
+      left.value = -350
       opacity.value = 0
       // Small delay for animation before emitting
       setTimeout(() => emit('delete', props.expense), 100)
@@ -63,7 +63,7 @@ const category = computed(() => categories[props.expense.category])
   <div relative rounded-xl mb-4 select-none touch-pan-y>
     <!-- Background (Trash Icon) -->
     <div 
-      transition="opacity" absolute inset-0 m-1
+      absolute inset-0 m-1
       bg-gradient-to-l from-gray="200/10" to-transparent rounded-3xl flex items-center
       justify-end pr-6 pointer-events-none
       :style="{ opacity: -left / 100 }"
