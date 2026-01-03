@@ -24,6 +24,7 @@ a:hover {
 }
 
 body {
+  background-color: #343466;
   margin: 0;
   display: flex;
   place-items: center;
@@ -63,6 +64,7 @@ input {
   left: 50%;
   border-radius: 100%;
   filter: blur(50px);
+  transition: opacity 0.5s;
   animation: rotate 5s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
@@ -92,4 +94,13 @@ input {
   50% {
     transform: scale(1.5) rotate(180deg);
   }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
