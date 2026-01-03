@@ -42,12 +42,12 @@ const handleUndo = async () => {
     />
     
     <div v-if="expenses.length === 0" text-center text-gray-500 py-10>
-      Nenhum gasto registrado
+      Nenhuma compra registrada
     </div>
 
     <ToastUndo 
       :show="showToast" 
-      message="Gasto apagado" 
+      message="Compra apagada" 
       @undo="handleUndo" 
       @close="showToast = false"
     />

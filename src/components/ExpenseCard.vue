@@ -88,7 +88,7 @@ const category = computed(() => categories[props.expense.category])
         <p text-xs text-gray-400>{{ expense.category }} • {{ formatDate(expense.createdAt) }}</p>
       </div>
       <div w-32 text="#f98fa5" font-bold font-mono text-right>
-        -R${{ expense.amount.toFixed(2) }}
+        -R${{ expense.amount.toFixed(2).replace('.', ',') }}
       </div>
     </div>
   </div>

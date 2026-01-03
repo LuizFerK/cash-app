@@ -10,7 +10,7 @@ const showAddModal = ref(false)
 
 const formattedBalance = computed(() => {
   const prefix = balance.value >= 0 ? 'R$' : '-R$'
-  return `${prefix}${Math.abs(balance.value).toFixed(2)}`
+  return `${prefix}${Math.abs(balance.value).toFixed(2).replace('.', ',')}`
 })
 </script>
 
@@ -53,7 +53,7 @@ const formattedBalance = computed(() => {
         fixed bottom-6 right-6 w-14 h-14 :class="{'green': balance >= 0, 'red': balance < 0}" text-white
         rounded-full shadow-lg flex items-center justify-center
         text-2xl hover:scale-105 transition-transform active:scale-95
-        aria-label="Adicionar Gasto"
+        aria-label="Adicionar compra"
       >
         <Plus :size="22" color-gray-200 />
       </button>

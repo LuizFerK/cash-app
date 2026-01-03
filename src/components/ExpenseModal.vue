@@ -145,7 +145,7 @@ function close() {
 
           <!-- Step 3: Name -->
           <div v-if="currentStep === 3" flex flex-col h-full>
-            <label text-gray-400 text-sm mb-2>Nome do gasto</label>
+            <label text-gray-400 text-sm mb-2>Nome da compra</label>
             <input 
               ref="nameInput"
               v-model="name"
