@@ -33,7 +33,7 @@ const handleUndo = async () => {
 </script>
 
 <template>
-  <div space-y-4 pb-20> <!-- padding bottom for FAB -->
+  <div space-y-4 pb-25> <!-- padding bottom for FAB -->
     <ExpenseCard
       v-for="expense in expenses"
       :key="expense.id"

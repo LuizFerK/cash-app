@@ -37,12 +37,12 @@ onUnmounted(() => {
     leave-from-class="translate-y-0 opacity-100"
     leave-to-class="translate-y-full opacity-0"
   >
-    <div v-if="show" fixed bottom-6 left="1/2" class="-translate-x-1/2" z-50 w-full max-w-sm px-4 pointer-events-none>
+    <div v-if="show" fixed bottom-6 left="1/2" translate-x="-1/2" z-50 w-full max-w-sm px-4 pointer-events-none>
       <div bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 px-4 py-3 rounded-lg shadow-lg flex items-center justify-between pointer-events-auto>
         <span text-sm font-medium>{{ message }}</span>
         <button 
           @click="$emit('undo')"
-          ml-4 text-blue-400 font-bold text-sm hover:text-blue-300 focus:outline-none uppercase
+          ml-4 text="#6262bf" font-bold text-sm focus:outline-none uppercase
         >
           Desfazer
         </button>

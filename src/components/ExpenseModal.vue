@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useFinance } from '../composables/useFinance'
-import { ShoppingBasket } from 'lucide-vue-next'
+import { ChevronLeft } from 'lucide-vue-next'
+import type { Category } from '../types'
+import { categories } from '../utils'
 
 const props = defineProps<{
   modelValue: boolean
@@ -13,26 +15,35 @@ const emit = defineEmits<{
 
 const { addExpense } = useFinance()
 
+const currentStep = ref(1)
 const name = ref('')
-const category = ref('')
+const category = ref<Category | ''>('')
 const amount = ref<number | ''>('')
 const loading = ref(false)
 
-async function handleSubmit() {
-  if (!name.value || !amount.value) return
+function selectCategory(cat: Category) {
+  category.value = cat
+}
+
+function nextStep() {
+  if (currentStep.value === 1 && category.value) {
+    currentStep.value = 2
+  } else if (currentStep.value === 2 && amount.value) {
+    currentStep.value = 3
+  }
+}
+
+async function handleSave() {
+  if (!name.value || !amount.value || !category.value) return
   
   loading.value = true
   try {
     await addExpense({
       name: name.value,
-      category: category.value || 'Geral',
+      category: category.value,
       amount: Number(amount.value)
     })
     close()
-    // Reset form
-    name.value = ''
-    category.value = ''
-    amount.value = ''
   } catch (e) {
     console.error(e)
     alert('Erro ao salvar')
@@ -42,6 +53,7 @@ async function handleSubmit() {
 }
 
 function close() {
+  currentStep.value = 1
   name.value = ''
   category.value = ''
   amount.value = ''
@@ -52,79 +64,96 @@ function close() {
 <template>
   <Transition name="modal">
     <div v-if="modelValue" fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black-50 backdrop-blur-sm @click.self="close">
-      <div w-full h="5/6" max-w-sm bg="#343466" rounded-t-2xl sm:rounded-2xl p-6 shadow-xl class="modal-card">
-        <div flex items-center gap-3 mb-8>
-          <ShoppingBasket :size="24" text-gray-200 />
-          <h2 text-xl font-bold text-gray-200>Registrar Gasto</h2>
+      <div w-full h="5/6" max-w-sm bg="#343466" rounded-t-2xl sm:rounded-2xl p-6 shadow-xl class="modal-card flex flex-col">
+        
+        <!-- Header -->
+        <div flex items-center justify-between mb-6>
+          <div flex items-center gap-2>
+             <button 
+              v-if="currentStep > 1" 
+              @click="currentStep--" 
+              text-gray-400 hover:text-white transition-colors
+            >
+              <ChevronLeft :size="24" />
+            </button>
+            <h2 text-xl font-bold text-gray-200>
+              {{ currentStep === 1 ? 'Categoria' : currentStep === 2 ? 'Valor' : 'Nome' }}
+            </h2>
+          </div>
+          <button @click="close" text-sm text-gray-400 hover:text-white>Cancelar</button>
         </div>
       
-      <form @submit.prevent="handleSubmit" space-y-4>
-        <div>
-          <label block text-lg font-medium text-gray-200 mb-2>Nome</label>
-          <input 
-            v-model="name"
-            type="text" 
-            w-full text-gray-200 bg-transparent border-b-2 border-gray="200/10" p-2.5 text-md
-            placeholder="Ex: Almoço"
-            required
-          />
-        </div>
+        <div flex-1 overflow-y-auto class="step-content">
+          <!-- Step 1: Categories -->
+          <div v-if="currentStep === 1" grid grid-cols-3 gap-3>
+            <button
+              v-for="[cat, { icon, color }] in Object.entries(categories)"
+              :key="cat"
+              @click="selectCategory(cat as Category)"
+              flex flex-col items-center justify-center aspect-square rounded-xl border-2 transition-all p-2
+              :style="{
+                background: category === cat ? color : '#ffffff10',
+                color: category === cat ? '#343466' : '#e5e7eb'
+              }"
+            >
+              <component :is="icon" :color="cat === category ? '#343466' : color" transition-colors :size="32" mb-2 />
+              <span text-xs font-medium text-center>{{ cat }}</span>
+            </button>
+          </div>
 
-        <div>
-          <label block text-sm font-medium text-gray-200 mb-1>Categoria</label>
-          <select 
-            v-model="category"
-            w-full rounded-lg border-gray-300 bg-gray-50 p-2.5 text-sm focus:ring-green-500 focus:border-green-500
-            :class="category === '' ? 'text-gray-400' : 'text-gray-200'"
-          >
-            <option selected disabled value="">Ex: Mercado</option>
-            <option value="Mercado">Mercado</option>
-            <option value="Restaurante">Restaurante</option>
-            <option value="Delivery">Delivery</option>
-            <option value="Uber/99">Uber/99</option>
-            <option value="BlaBlaCar">BlaBlaCar</option>
-            <option value="Ônibus">Ônibus</option>
-            <option value="Farmácia">Farmácia</option>
-            <option value="Cinema">Cinema</option>
-            <option value="Ingresso">Ingresso</option>
-            <option value="Outros">Outros</option>
-          </select>
-        </div>
+          <!-- Step 2: Amount -->
+          <div v-if="currentStep === 2" flex flex-col items-center justify-center h-full>
+            <label text-gray-400 text-sm mb-2>Quanto foi?</label>
+            <div relative w-full>
+              <span absolute left-0 top="1/2" translate-y="-1/2" text-2xl text-gray-400 font-medium>R$</span>
+              <input
+                v-model="amount"
+                type="number" 
+                step="0.01"
+                w-full pl-10 bg-transparent text-4xl font-bold text-white text-center focus:outline-none placeholder-gray-600
+                placeholder="0.00"
+                autofocus
+                @keydown.enter="nextStep"
+              />
+            </div>
+          </div>
 
-        <div>
-          <label block text-lg font-medium text-gray-200 mb-2>Valor</label>
-          <div relative>
-            <span absolute left-3 top-2.4 text-gray-400>R$</span>
+          <!-- Step 3: Name -->
+          <div v-if="currentStep === 3" flex flex-col h-full>
+            <label text-gray-400 text-sm mb-2>Nome do gasto</label>
             <input 
-              v-model="amount"
-              type="number" 
-              step="0.01"
-              w-full pl-10 text-gray-200 bg-transparent border-b-2 border-gray="200/10" p-2.5 text-md
-              placeholder="0.00"
-              required
+              v-model="name"
+              type="text" 
+              w-full bg-transparent border-b-2 border="white/20" py-3 text-xl text-white placeholder-gray-500 outline-none transition-colors
+              placeholder="Ex: Almoço de domingo"
+              autofocus
+              @keydown.enter="handleSave"
             />
           </div>
         </div>
 
-        <div flex gap-3 mt-6>
+        <!-- Footer Actions -->
+        <div mt-6>
           <button 
-            type="button" 
-            @click="close"
-            flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-200 hover:bg-gray-50
+            v-if="currentStep < 3"
+            @click="nextStep"
+            w-full py-3.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all
+            :disabled="(currentStep === 1 && !category) || (currentStep === 2 && !amount)"
           >
-            Cancelar
+            Próximo
           </button>
           <button 
-            type="submit"
-            :disabled="loading || !name || !category || !amount"
-            flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed
+            v-else
+            @click="handleSave"
+            w-full py-3.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all
+            :disabled="loading || !name"
           >
             {{ loading ? 'Salvando...' : 'Salvar' }}
           </button>
         </div>
-      </form>
+
+      </div>
     </div>
-  </div>
   </Transition>
 </template>
 
