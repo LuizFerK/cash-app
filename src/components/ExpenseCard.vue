@@ -19,34 +19,34 @@ const el = ref<HTMLElement | null>(null)
 const left = ref(0)
 const opacity = ref(1)
 
-const { lengthX, isSwiping } = useSwipe(el, {
+const { isSwiping } = useSwipe(el, {
   passive: false,
   onSwipe() {
     // Only allow swiping left (negative X)
-    if (lengthX.value < 0) {
-      left.value = 0
-      return
-    }
+    // if (lengthX.value < 0) {
+    //   left.value = 0
+    //   return
+    // }
     
-    // Move element to left (translateX is negative)
-    left.value = -lengthX.value
+    // // Move element to left (translateX is negative)
+    // left.value = -lengthX.value
     
-    // Delete threshold ~ 150px
-    if (lengthX.value > 150) {
-      opacity.value = 1 - (lengthX.value - 150) / 100
-    }
+    // // Delete threshold ~ 150px
+    // if (lengthX.value > 150) {
+    //   opacity.value = 1 - (lengthX.value - 150) / 100
+    // }
   },
   onSwipeEnd() {
-    if (lengthX.value > 150) { // Threshold reached
-      left.value = -350
-      opacity.value = 0
-      // Small delay for animation before emitting
-      setTimeout(() => emit('delete', props.expense), 100)
-    } else {
-      // Bounce back
-      left.value = 0
-      opacity.value = 1
-    }
+    // if (lengthX.value > 150) { // Threshold reached
+    //   left.value = -350
+    //   opacity.value = 0
+    //   // Small delay for animation before emitting
+    //   setTimeout(() => emit('delete', props.expense), 100)
+    // } else {
+    //   // Bounce back
+    //   left.value = 0
+    //   opacity.value = 1
+    // }
   }
 })
 

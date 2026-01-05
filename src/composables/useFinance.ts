@@ -8,7 +8,6 @@ import {
   serverTimestamp,
   query,
   orderBy,
-  limit,
   setDoc,
   deleteDoc,
   Timestamp,
@@ -71,7 +70,7 @@ export function useFinance() {
 
 function init() {
   // Listen to expenses
-  expensesRef.value = query(collection(db, 'expenses'), orderBy('createdAt', 'desc'), limit(10))
+  expensesRef.value = query(collection(db, 'expenses'), orderBy('createdAt', 'desc'))
   onSnapshot(expensesRef.value, (snapshot) => {
     expenses.value = snapshot.docs.map(doc => ({
       id: doc.id,
