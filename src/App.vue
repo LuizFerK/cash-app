@@ -17,7 +17,7 @@ const formattedBalance = computed(() => {
 
 const dailyAmountFormatted = computed(() => {
   if (loading.value) return '...'
-  return `R$${dailyAmount.value.toFixed(2).replace('.', ',')}`
+  return `R$${dailyAmount.toFixed(2).replace('.', ',')}`
 })
 </script>
 

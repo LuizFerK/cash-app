@@ -27,12 +27,6 @@ export interface ExpenseInput {
   amount: number
 }
 
-export interface Config {
-  lastSync: Timestamp
-  balance: number
-  dailyAmount: number
-}
-
 export type CategoryIcon = {
   [key in Category]: {
     icon: LucideIcon
